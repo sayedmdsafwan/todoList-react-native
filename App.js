@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
     KeyboardAvoidingView,
@@ -6,11 +7,27 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    Keyboard,
     View,
 } from "react-native";
 import Task from "./components/Task";
 
 export default function App() {
+    const [task, setTask] = useState([]);
+    const [taskItems, setTaskItems] = useState([]);
+
+    const handleAddTask = () => {
+        Keyboard.dismiss();
+        setTaskItems([...taskItems, task]);
+        setTask(null);
+    };
+
+    const completeTask = (index) => {
+        const itemsCopy = [...taskItems];
+        itemsCopy.splice(index, 1);
+        setTaskItems(itemsCopy);
+    };
+
     return (
         <View style={styles.container}>
             {/* Today's Tasks */}
@@ -18,8 +35,14 @@ export default function App() {
                 <Text style={styles.sectionTitle}>Today's Tasks</Text>
                 <View style={styles.items}>
                     {/* This is where all tasks will go */}
-                    <Task text="Task 1" />
-                    <Task text="Task 2" />
+                    {taskItems.map((item, index) => (
+                        <TouchableOpacity
+                            onPress={() => completeTask()}
+                            key={index}
+                        >
+                            <Task text={item} />
+                        </TouchableOpacity>
+                    ))}
                 </View>
             </View>
             {/* Write a task */}
@@ -30,8 +53,9 @@ export default function App() {
                 <TextInput
                     style={styles.input}
                     placeholder={"Write a task"}
+                    onChangeText={(text) => setTask(text)}
                 ></TextInput>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => handleAddTask()}>
                     <View style={styles.addWrapper}>
                         <Text style={styles.addText}>+</Text>
                     </View>
